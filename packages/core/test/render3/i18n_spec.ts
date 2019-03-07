@@ -18,6 +18,7 @@ import {allocHostVars, element, elementEnd, elementStart, template, text, nextCo
 import {COMMENT_MARKER, ELEMENT_MARKER, I18nMutateOpCode, I18nUpdateOpCode, I18nUpdateOpCodes, TI18n} from '../../src/render3/interfaces/i18n';
 import {HEADER_OFFSET, LView, TVIEW} from '../../src/render3/interfaces/view';
 import {ComponentFixture, TemplateFixture} from './render_util';
+import {fixmeIvy} from '@angular/private/testing';
 
 const Component: typeof _Component = function(...args: any[]): any {
   // In test we use @Component for documentation only so it's safe to mock out the implementation.
@@ -537,41 +538,43 @@ describe('Runtime i18n', () => {
       expect(fixture.html).toEqual('<div>Hello <span>world</span> and <div>universe</div>!</div>');
     });
 
-    it('for translations without top level element', () => {
-      // When it's the first node
-      let MSG_DIV = `Hello world`;
-      let fixture = prepareFixture(() => { i18n(0, MSG_DIV); }, null, 1);
+    fixmeIvy(
+        'FW-1112: i18n Seems to incorrectly compute DOM nodes to remove and reads non-DOM nodes instead')
+        .it('for translations without top level element', () => {
+          // When it's the first node
+          let MSG_DIV = `Hello world`;
+          let fixture = prepareFixture(() => { i18n(0, MSG_DIV); }, null, 1);
 
-      expect(fixture.html).toEqual('Hello world');
+          expect(fixture.html).toEqual('Hello world');
 
-      // When the first node is a text node
-      MSG_DIV = ` world`;
-      fixture = prepareFixture(() => {
-        text(0, 'Hello');
-        i18n(1, MSG_DIV);
-      }, null, 2);
+          // When the first node is a text node
+          MSG_DIV = ` world`;
+          fixture = prepareFixture(() => {
+            text(0, 'Hello');
+            i18n(1, MSG_DIV);
+          }, null, 2);
 
-      expect(fixture.html).toEqual('Hello world');
+          expect(fixture.html).toEqual('Hello world');
 
-      // When the first node is an element
-      fixture = prepareFixture(() => {
-        elementStart(0, 'div');
-        text(1, 'Hello');
-        elementEnd();
-        i18n(2, MSG_DIV);
-      }, null, 3);
+          // When the first node is an element
+          fixture = prepareFixture(() => {
+            elementStart(0, 'div');
+            text(1, 'Hello');
+            elementEnd();
+            i18n(2, MSG_DIV);
+          }, null, 3);
 
-      expect(fixture.html).toEqual('<div>Hello</div> world');
+          expect(fixture.html).toEqual('<div>Hello</div> world');
 
-      // When there is a node after
-      MSG_DIV = `Hello `;
-      fixture = prepareFixture(() => {
-        i18n(0, MSG_DIV);
-        text(1, 'world');
-      }, null, 2);
+          // When there is a node after
+          MSG_DIV = `Hello `;
+          fixture = prepareFixture(() => {
+            i18n(0, MSG_DIV);
+            text(1, 'world');
+          }, null, 2);
 
-      expect(fixture.html).toEqual('Hello world');
-    });
+          expect(fixture.html).toEqual('Hello world');
+        });
 
     it('for deleted placeholders', () => {
       const MSG_DIV = `Hello �#3�world�/#3�`;

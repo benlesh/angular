@@ -93,12 +93,20 @@ export class QueryList<T>/* implements Iterable<T> */ {
     return this._results.some(fn);
   }
 
+  /**
+   * Returns a copy of the internal results list as an Array.
+   */
   toArray(): T[] { return this._results.slice(); }
 
   [getSymbolIterator()](): Iterator<T> { return (this._results as any)[getSymbolIterator()](); }
 
   toString(): string { return this._results.toString(); }
 
+  /**
+   * Flattens deeply nested array of query results into a flat array of results, depth-first, then
+   * resets `dirty` to `false`, and updates the `length`, `last` and `first` properties.
+   * @param res The results tree to flatten and store
+   */
   reset(res: Array<T|any[]>): void {
     this._results = flatten(res);
     (this as{dirty: boolean}).dirty = false;
@@ -107,6 +115,9 @@ export class QueryList<T>/* implements Iterable<T> */ {
     (this as{first: T}).first = this._results[0];
   }
 
+  /**
+   * Triggers a change event by emitting on the `changes` {@link EventEmitter}.
+   */
   notifyOnChanges(): void { (this.changes as EventEmitter<any>).emit(this); }
 
   /** internal */

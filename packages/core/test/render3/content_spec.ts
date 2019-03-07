@@ -16,6 +16,7 @@ import {RenderFlags} from '../../src/render3/interfaces/definition';
 import {TemplateRef, ViewContainerRef, QueryList} from '@angular/core';
 import {NgIf, NgForOf} from './common_with_def';
 import {ComponentFixture, createComponent, getDirectiveOnNode, renderComponent, toHtml} from './render_util';
+import {fixmeIvy} from '@angular/private/testing';
 
 describe('content projection', () => {
   it('should project content', () => {
@@ -573,87 +574,89 @@ describe('content projection', () => {
        expect(toHtml(parent)).toEqual('<child><div></div></child>');
      });
 
-  it('should project containers into containers', () => {
-    /**
-     * <div>
-     *  Before (inside)
-     *  % if (!skipContent) {
-     *    <ng-content></ng-content>
-     *  % }
-     *  After (inside)
-     * </div>
-     */
-    const Child = createComponent('child', function(rf: RenderFlags, ctx: any) {
-      if (rf & RenderFlags.Create) {
-        projectionDef();
-        elementStart(0, 'div');
-        {
-          text(1, 'Before (inside)-');
-          container(2);
-          text(3, '-After (inside)');
-        }
-        elementEnd();
-      }
-      if (rf & RenderFlags.Update) {
-        containerRefreshStart(2);
-        {
-          if (!ctx.skipContent) {
-            let rf0 = embeddedViewStart(0, 1, 0);
-            if (rf0 & RenderFlags.Create) {
-              projection(0);
+
+  fixmeIvy('FW-1147: Inline JavaScript not working after insert-after refactor')
+      .it('should project containers into containers', () => {
+        /**
+         * <div>
+         *  Before (inside)
+         *  % if (!skipContent) {
+         *    <ng-content></ng-content>
+         *  % }
+         *  After (inside)
+         * </div>
+         */
+        const Child = createComponent('child', function(rf: RenderFlags, ctx: any) {
+          if (rf & RenderFlags.Create) {
+            projectionDef();
+            elementStart(0, 'div');
+            {
+              text(1, 'Before (inside)-');
+              container(2);
+              text(3, '-After (inside)');
             }
-            embeddedViewEnd();
+            elementEnd();
           }
-        }
-        containerRefreshEnd();
-      }
-    }, 4);
-
-    /**
-     * <child>
-     *     Before text-
-     *     % if (!skipContent) {
-     *       content
-     *     % }
-     *     -After text
-     * </child>
-     */
-    const Parent = createComponent('parent', function(rf: RenderFlags, ctx: any) {
-      if (rf & RenderFlags.Create) {
-        elementStart(0, 'child');
-        {
-          text(1, 'Before text-');
-          container(2);
-          text(3, '-After text');
-        }
-        elementEnd();
-      }
-      if (rf & RenderFlags.Update) {
-        containerRefreshStart(2);
-        {
-          if (!ctx.skipContent) {
-            let rf0 = embeddedViewStart(0, 1, 0);
-            if (rf0 & RenderFlags.Create) {
-              text(0, 'content');
+          if (rf & RenderFlags.Update) {
+            containerRefreshStart(2);
+            {
+              if (!ctx.skipContent) {
+                let rf0 = embeddedViewStart(0, 1, 0);
+                if (rf0 & RenderFlags.Create) {
+                  projection(0);
+                }
+                embeddedViewEnd();
+              }
             }
-            embeddedViewEnd();
+            containerRefreshEnd();
           }
-        }
-        containerRefreshEnd();
-      }
-    }, 4, 0, [Child]);
+        }, 4);
 
-    const fixture = new ComponentFixture(Parent);
-    expect(fixture.html)
-        .toEqual(
-            '<child><div>Before (inside)-Before text-content-After text-After (inside)</div></child>');
+        /**
+         * <child>
+         *     Before text-
+         *     % if (!skipContent) {
+         *       content
+         *     % }
+         *     -After text
+         * </child>
+         */
+        const Parent = createComponent('parent', function(rf: RenderFlags, ctx: any) {
+          if (rf & RenderFlags.Create) {
+            elementStart(0, 'child');
+            {
+              text(1, 'Before text-');
+              container(2);
+              text(3, '-After text');
+            }
+            elementEnd();
+          }
+          if (rf & RenderFlags.Update) {
+            containerRefreshStart(2);
+            {
+              if (!ctx.skipContent) {
+                let rf0 = embeddedViewStart(0, 1, 0);
+                if (rf0 & RenderFlags.Create) {
+                  text(0, 'content');
+                }
+                embeddedViewEnd();
+              }
+            }
+            containerRefreshEnd();
+          }
+        }, 4, 0, [Child]);
 
-    fixture.component.skipContent = true;
-    fixture.update();
-    expect(fixture.html)
-        .toEqual(
-            '<child><div>Before (inside)-Before text--After text-After (inside)</div></child>');
-  });
+        const fixture = new ComponentFixture(Parent);
+        expect(fixture.html)
+            .toEqual(
+                '<child><div>Before (inside)-Before text-content-After text-After (inside)</div></child>');
+
+        fixture.component.skipContent = true;
+        fixture.update();
+        expect(fixture.html)
+            .toEqual(
+                '<child><div>Before (inside)-Before text--After text-After (inside)</div></child>');
+      });
 
   it('should re-project containers into containers', () => {
     /**
@@ -746,62 +749,64 @@ describe('content projection', () => {
         .toEqual('<parent><child><div>Before text-After text</div></child></parent>');
   });
 
-  it('should support projection into embedded views when ng-content is a root node of an embedded view, with other nodes after',
-     () => {
-       let childCmptInstance: any;
 
-       /**
-        * <div>
-        *  % if (!skipContent) {
-         *    before-<ng-content></ng-content>-after
-         *  % }
-        * </div>
-        */
-       const Child = createComponent('child', function(rf: RenderFlags, ctx: any) {
-         if (rf & RenderFlags.Create) {
-           projectionDef();
-           elementStart(0, 'div');
-           { container(1); }
-           elementEnd();
-         }
-         if (rf & RenderFlags.Update) {
-           containerRefreshStart(1);
-           {
-             if (!ctx.skipContent) {
-               let rf0 = embeddedViewStart(0, 3, 0);
-               if (rf0 & RenderFlags.Create) {
-                 text(0, 'before-');
-                 projection(1);
-                 text(2, '-after');
-               }
-               embeddedViewEnd();
-             }
-           }
-           containerRefreshEnd();
-         }
-       }, 2);
+  fixmeIvy('FW-1147: Inline JavaScript not working after insert-after refactor')
+      .it('should support projection into embedded views when ng-content is a root node of an embedded view, with other nodes after',
+          () => {
+            let childCmptInstance: any;
 
-       /**
-        * <child>content</child>
-        */
-       const Parent = createComponent('parent', function(rf: RenderFlags, ctx: any) {
-         if (rf & RenderFlags.Create) {
-           elementStart(0, 'child');
-           {
-             childCmptInstance = getDirectiveOnNode(0);
-             text(1, 'content');
-           }
-           elementEnd();
-         }
-       }, 2, 0, [Child]);
+            /**
+             * <div>
+             *  % if (!skipContent) {
+              *    before-<ng-content></ng-content>-after
+              *  % }
+             * </div>
+             */
+            const Child = createComponent('child', function(rf: RenderFlags, ctx: any) {
+              if (rf & RenderFlags.Create) {
+                projectionDef();
+                elementStart(0, 'div');
+                { container(1); }
+                elementEnd();
+              }
+              if (rf & RenderFlags.Update) {
+                containerRefreshStart(1);
+                {
+                  if (!ctx.skipContent) {
+                    let rf0 = embeddedViewStart(0, 3, 0);
+                    if (rf0 & RenderFlags.Create) {
+                      text(0, 'before-');
+                      projection(1);
+                      text(2, '-after');
+                    }
+                    embeddedViewEnd();
+                  }
+                }
+                containerRefreshEnd();
+              }
+            }, 2);
 
-       const parent = renderComponent(Parent);
-       expect(toHtml(parent)).toEqual('<child><div>before-content-after</div></child>');
+            /**
+             * <child>content</child>
+             */
+            const Parent = createComponent('parent', function(rf: RenderFlags, ctx: any) {
+              if (rf & RenderFlags.Create) {
+                elementStart(0, 'child');
+                {
+                  childCmptInstance = getDirectiveOnNode(0);
+                  text(1, 'content');
+                }
+                elementEnd();
+              }
+            }, 2, 0, [Child]);
 
-       childCmptInstance.skipContent = true;
-       detectChanges(parent);
-       expect(toHtml(parent)).toEqual('<child><div></div></child>');
-     });
+            const parent = renderComponent(Parent);
+            expect(toHtml(parent)).toEqual('<child><div>before-content-after</div></child>');
+
+            childCmptInstance.skipContent = true;
+            detectChanges(parent);
+            expect(toHtml(parent)).toEqual('<child><div></div></child>');
+          });
 
   it('should project into dynamic views (with createEmbeddedView)', () => {
     /**

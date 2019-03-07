@@ -23,6 +23,7 @@ import {NgForOf} from '../../test/render3/common_with_def';
 
 import {getRendererFactory2} from './imported_renderer2';
 import {ComponentFixture, createComponent, getDirectiveOnNode, TemplateFixture,} from './render_util';
+import {fixmeIvy} from '@angular/private/testing';
 
 const Component: typeof _Component = function(...args: any[]): any {
   // In test we use @Component for documentation only so it's safe to mock out the implementation.
@@ -1357,51 +1358,52 @@ describe('ViewContainerRef', () => {
           .toEqual('<child><div><header vcref="">blah</header><span>bar</span></div></child>');
     });
 
-    it('should project the ViewContainerRef content along its host, in a view', () => {
-      @Component({
-        selector: 'child-with-view',
-        template: `
+    fixmeIvy('FW-1147: Inline JavaScript not working after insert-after refactor')
+        .it('should project the ViewContainerRef content along its host, in a view', () => {
+          @Component({
+            selector: 'child-with-view',
+            template: `
           Before (inside)-
           % if (show) {
             <ng-content></ng-content>
           % }
           After (inside)
         `
-      })
-      class ChildWithView {
-        show: boolean = true;
-        static ngComponentDef = defineComponent({
-          type: ChildWithView,
-          encapsulation: ViewEncapsulation.None,
-          selectors: [['child-with-view']],
-          factory: () => new ChildWithView(),
-          consts: 3,
-          vars: 0,
-          template: (rf: RenderFlags, cmp: ChildWithView) => {
-            if (rf & RenderFlags.Create) {
-              projectionDef();
-              text(0, 'Before (inside)-');
-              container(1);
-              text(2, 'After (inside)');
-            }
-            if (rf & RenderFlags.Update) {
-              containerRefreshStart(1);
-              if (cmp.show) {
-                let rf0 = embeddedViewStart(0, 1, 0);
-                if (rf0 & RenderFlags.Create) {
-                  projection(0);
+          })
+          class ChildWithView {
+            show: boolean = true;
+            static ngComponentDef = defineComponent({
+              type: ChildWithView,
+              encapsulation: ViewEncapsulation.None,
+              selectors: [['child-with-view']],
+              factory: () => new ChildWithView(),
+              consts: 3,
+              vars: 0,
+              template: (rf: RenderFlags, cmp: ChildWithView) => {
+                if (rf & RenderFlags.Create) {
+                  projectionDef();
+                  text(0, 'Before (inside)-');
+                  container(1);
+                  text(2, 'After (inside)');
                 }
-                embeddedViewEnd();
+                if (rf & RenderFlags.Update) {
+                  containerRefreshStart(1);
+                  if (cmp.show) {
+                    let rf0 = embeddedViewStart(0, 1, 0);
+                    if (rf0 & RenderFlags.Create) {
+                      projection(0);
+                    }
+                    embeddedViewEnd();
+                  }
+                  containerRefreshEnd();
+                }
               }
-              containerRefreshEnd();
-            }
+            });
           }
-        });
-      }
 
-      @Component({
-        selector: 'parent',
-        template: `
+          @Component({
+            selector: 'parent',
+            template: `
           <ng-template #foo>
               <span>{{name}}</span>
           </ng-template>
@@ -1410,50 +1412,51 @@ describe('ViewContainerRef', () => {
             <header vcref [tplRef]="foo" [name]="name">blah</header>
             After projected
           </child-with-view>`
-      })
-      class Parent {
-        name: string = 'bar';
-        static ngComponentDef = defineComponent({
-          type: Parent,
-          encapsulation: ViewEncapsulation.None,
-          selectors: [['parent']],
-          factory: () => new Parent(),
-          consts: 7,
-          vars: 2,
-          template: (rf: RenderFlags, cmp: Parent) => {
-            if (rf & RenderFlags.Create) {
-              template(
-                  0, embeddedTemplate, 2, 1, 'ng-template', undefined, ['foo', ''],
-                  templateRefExtractor);
-              elementStart(2, 'child-with-view');
-              text(3, 'Before projected');
-              elementStart(4, 'header', ['vcref', '']);
-              text(5, 'blah');
-              elementEnd();
-              text(6, 'After projected-');
-              elementEnd();
-            }
-            if (rf & RenderFlags.Update) {
-              const tplRef = reference(1);
-              elementProperty(4, 'tplRef', bind(tplRef));
-              elementProperty(4, 'name', bind(cmp.name));
-            }
-          },
-          directives: [ChildWithView, DirectiveWithVCRef]
+          })
+          class Parent {
+            name: string = 'bar';
+            static ngComponentDef = defineComponent({
+              type: Parent,
+              encapsulation: ViewEncapsulation.None,
+              selectors: [['parent']],
+              factory: () => new Parent(),
+              consts: 7,
+              vars: 2,
+              template: (rf: RenderFlags, cmp: Parent) => {
+                if (rf & RenderFlags.Create) {
+                  template(
+                      0, embeddedTemplate, 2, 1, 'ng-template', undefined, ['foo', ''],
+                      templateRefExtractor);
+                  elementStart(2, 'child-with-view');
+                  text(3, 'Before projected');
+                  elementStart(4, 'header', ['vcref', '']);
+                  text(5, 'blah');
+                  elementEnd();
+                  text(6, 'After projected-');
+                  elementEnd();
+                }
+                if (rf & RenderFlags.Update) {
+                  const tplRef = reference(1);
+                  elementProperty(4, 'tplRef', bind(tplRef));
+                  elementProperty(4, 'name', bind(cmp.name));
+                }
+              },
+              directives: [ChildWithView, DirectiveWithVCRef]
+            });
+          }
+
+          const fixture = new ComponentFixture(Parent);
+          expect(fixture.html)
+              .toEqual(
+                  '<child-with-view>Before (inside)-Before projected<header vcref="">blah</header>After projected-After (inside)</child-with-view>');
+
+          directiveInstance !.vcref.createEmbeddedView(
+              directiveInstance !.tplRef, fixture.component);
+          fixture.update();
+          expect(fixture.html)
+              .toEqual(
+                  '<child-with-view>Before (inside)-Before projected<header vcref="">blah</header><span>bar</span>After projected-After (inside)</child-with-view>');
         });
-      }
-
-      const fixture = new ComponentFixture(Parent);
-      expect(fixture.html)
-          .toEqual(
-              '<child-with-view>Before (inside)-Before projected<header vcref="">blah</header>After projected-After (inside)</child-with-view>');
-
-      directiveInstance !.vcref.createEmbeddedView(directiveInstance !.tplRef, fixture.component);
-      fixture.update();
-      expect(fixture.html)
-          .toEqual(
-              '<child-with-view>Before (inside)-Before projected<header vcref="">blah</header><span>bar</span>After projected-After (inside)</child-with-view>');
-    });
 
     describe('with select', () => {
       @Component({

@@ -12,7 +12,7 @@ import {assertLViewOrUndefined} from './assert';
 import {executeHooks} from './hooks';
 import {ComponentDef, DirectiveDef} from './interfaces/definition';
 import {TElementNode, TNode, TViewNode} from './interfaces/node';
-import {BINDING_INDEX, CONTEXT, DECLARATION_VIEW, FLAGS, InitPhaseState, LView, LViewFlags, OpaqueViewState, TVIEW} from './interfaces/view';
+import {BINDING_INDEX, CONTEXT, DECLARATION_VIEW, FLAGS, InitPhaseState, LView, LViewFlags, TVIEW, View} from './interfaces/view';
 import {resetPreOrderHookFlags} from './util/view_utils';
 
 
@@ -128,7 +128,7 @@ export function getLView(): LView {
  *
  * @param viewToRestore The OpaqueViewState instance to restore.
  */
-export function restoreView(viewToRestore: OpaqueViewState) {
+export function restoreView(viewToRestore: View) {
   contextLView = viewToRestore as any as LView;
 }
 

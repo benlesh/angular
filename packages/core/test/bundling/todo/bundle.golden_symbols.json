@@ -390,9 +390,6 @@
     "name": "addTContainerToQueries"
   },
   {
-    "name": "addToViewTree"
-  },
-  {
     "name": "allocPlayerContext"
   },
   {
@@ -406,6 +403,15 @@
   },
   {
     "name": "appendChild"
+  },
+  {
+    "name": "appendChildView"
+  },
+  {
+    "name": "appendProjectedNode"
+  },
+  {
+    "name": "appendProjectedNodes"
   },
   {
     "name": "applyOnCreateInstructions"
@@ -484,9 +490,6 @@
   },
   {
     "name": "createElementRef"
-  },
-  {
-    "name": "createEmbeddedViewAndNode"
   },
   {
     "name": "createEmptyStylingContext"
@@ -654,7 +657,7 @@
     "name": "generatePropertyAliases"
   },
   {
-    "name": "getBeforeNodeForView"
+    "name": "getBeforeNodeForContainedView"
   },
   {
     "name": "getBindingsEnabled"
@@ -705,6 +708,9 @@
     "name": "getElementDepthCount"
   },
   {
+    "name": "getEmbeddedViewFactoryInternal"
+  },
+  {
     "name": "getErrorLogger"
   },
   {
@@ -738,6 +744,9 @@
     "name": "getInjectorIndex"
   },
   {
+    "name": "getInsertBeforeForContainer"
+  },
+  {
     "name": "getIsParent"
   },
   {
@@ -748,6 +757,9 @@
   },
   {
     "name": "getLViewParent"
+  },
+  {
+    "name": "getLastRootElementFromView"
   },
   {
     "name": "getMatchingBindingIndex"
@@ -763,9 +775,6 @@
   },
   {
     "name": "getNameOnlyMarkerIndex"
-  },
-  {
-    "name": "getNativeAnchorNode"
   },
   {
     "name": "getNativeByIndex"
@@ -829,6 +838,9 @@
   },
   {
     "name": "getProp"
+  },
+  {
+    "name": "getRNode"
   },
   {
     "name": "getRenderFlags"
@@ -930,6 +942,12 @@
     "name": "insertBloom"
   },
   {
+    "name": "insertChildBefore"
+  },
+  {
+    "name": "insertNodeOrNodesBefore"
+  },
+  {
     "name": "insertView"
   },
   {
@@ -1023,6 +1041,12 @@
     "name": "iterateListLike"
   },
   {
+    "name": "lContainerToViewContainer"
+  },
+  {
+    "name": "lViewToView"
+  },
+  {
     "name": "leaveView"
   },
   {
@@ -1063,12 +1087,6 @@
   },
   {
     "name": "namespaceHTML"
-  },
-  {
-    "name": "nativeAppendChild"
-  },
-  {
-    "name": "nativeAppendOrInsertBefore"
   },
   {
     "name": "nativeInsertBefore"
@@ -1158,7 +1176,7 @@
     "name": "removeListeners"
   },
   {
-    "name": "removeView"
+    "name": "renderChild"
   },
   {
     "name": "renderComponent"
@@ -1326,6 +1344,9 @@
     "name": "trackByIdentity"
   },
   {
+    "name": "unwrapLContainer"
+  },
+  {
     "name": "unwrapRNode"
   },
   {
@@ -1345,6 +1366,36 @@
   },
   {
     "name": "viewAttachedToContainer"
+  },
+  {
+    "name": "viewContainerGet"
+  },
+  {
+    "name": "viewContainerGetInternal"
+  },
+  {
+    "name": "viewContainerIndexOfInternal"
+  },
+  {
+    "name": "viewContainerInsertAfter"
+  },
+  {
+    "name": "viewContainerInsertAfterInternal"
+  },
+  {
+    "name": "viewContainerRemove"
+  },
+  {
+    "name": "viewContainerRemoveInternal"
+  },
+  {
+    "name": "viewContainerToLContainer"
+  },
+  {
+    "name": "viewDestroy"
+  },
+  {
+    "name": "viewToLView"
   },
   {
     "name": "walkTNodeTree"

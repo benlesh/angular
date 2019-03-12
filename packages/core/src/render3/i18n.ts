@@ -10,6 +10,7 @@ import {SRCSET_ATTRS, URI_ATTRS, VALID_ATTRS, VALID_ELEMENTS, getTemplateContent
 import {InertBodyHelper} from '../sanitization/inert_body';
 import {_sanitizeUrl, sanitizeSrcset} from '../sanitization/url_sanitizer';
 import {assertDefined, assertDomNode, assertEqual, assertGreaterThan, isDomNode} from '../util/assert';
+
 import {attachPatchData} from './context_discovery';
 import {allocExpando, createNodeAtIndex, elementAttribute, load, textBinding} from './instructions';
 import {LContainer, NATIVE} from './interfaces/container';
@@ -19,7 +20,7 @@ import {RComment, RElement, RNode, RText} from './interfaces/renderer';
 import {SanitizerFn} from './interfaces/sanitization';
 import {StylingContext} from './interfaces/styling';
 import {BINDING_INDEX, HEADER_OFFSET, LView, RENDERER, TVIEW, TView, T_HOST} from './interfaces/view';
-import {appendChild, createTextNode, nativeRemoveNode} from './node_manipulation';
+import {appendChild, createTextNode, getRenderParent, nativeInsertBefore, nativeParentNode, nativeRemoveNode} from './node_manipulation';
 import {getIsParent, getLView, getPreviousOrParentTNode, setIsParent, setPreviousOrParentTNode} from './state';
 import {NO_CHANGE} from './tokens';
 import {addAllToArray} from './util/array_utils';
@@ -501,6 +502,15 @@ function appendI18nNode(tNode: TNode, parentTNode: TNode, previousTNode: TNode |
   let beforeNode: RNode|null = null;
   if (tNode.parent && tNode.parent.type === TNodeType.IcuContainer) {
     beforeNode = getNativeByTNode(tNode.parent, viewData);
+
+    // HACK(benlesh): In some cases, ICU comment nodes were not appropriately added to the intended
+    // parent. This forces them to be added, so insertion of what's important below does not error.
+    // This is highly suspect, IMO, but it seems to have things working.
+    const renderer = viewData[RENDERER];
+    const renderParent = getRenderParent(tNode, viewData) !;
+    if (nativeParentNode(renderer, beforeNode) !== renderParent) {
+      nativeInsertBefore(renderer, renderParent, beforeNode, null);
+    }
   }
 
   appendChild(getNativeByTNode(tNode, viewData), tNode, viewData, beforeNode);

@@ -967,7 +967,7 @@ import {HostListener} from '../../src/metadata/directives';
         });
       });
 
-      it('should find :enter nodes that have been inserted around non enter nodes', () => {
+      fit('should find :enter nodes that have been inserted around non enter nodes', () => {
         @Component({
           selector: 'ani-cmp',
           template: `

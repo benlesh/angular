@@ -949,18 +949,32 @@ export class TemplateDefinitionBuilder implements t.Visitor<void>, LocalResolver
   private templatePropertyBindings(
       template: t.Template, templateIndex: number, context: o.ReadVarExpr,
       attrs: (t.BoundAttribute|t.TextAttribute)[]) {
-    attrs.forEach(input => {
+    const propertyInstructionFns: ((exp?: o.Expression) => o.Expression)[] = [];
+    const params: (() => o.Expression[])[] = [];
+    let i = 0;
+
+    attrs.forEach((input) => {
       if (input instanceof t.BoundAttribute) {
         const value = input.value.visit(this._valueConverter);
         this.allocateBindingSlots(value);
-        this.updateInstruction(templateIndex, template.sourceSpan, R3.elementProperty, () => {
-          return [
-            o.literal(templateIndex), o.literal(input.name),
-            this.convertPropertyBinding(context, value)
-          ];
-        });
+        const index = i++;
+        params.push(
+            () => [o.literal(input.name), this.convertPropertyBinding(context, value, true)]);
+        if (index === 0) {
+          propertyInstructionFns.push(
+              () => instruction(template.sourceSpan, R3.property, params[index]()));
+        } else {
+          propertyInstructionFns.push(
+              (exp: o.Expression) => exp.callFn(params[index](), template.sourceSpan));
+        }
       }
     });
+
+    if (propertyInstructionFns.length > 0) {
+      const createPropertyChainStatement = () =>
+          propertyInstructionFns.reduce((prev, fn) => fn(prev), undefined) !.toStmt();
+      this._updateCodeFns.push(createPropertyChainStatement);
+    }
   }
 
   // Bindings must only be resolved after all local refs have been visited, so all
@@ -995,13 +1009,17 @@ export class TemplateDefinitionBuilder implements t.Visitor<void>, LocalResolver
     this.instructionFn(this._creationCodeFns, span, reference, paramsOrFn || [], prepend);
   }
 
-  private updateInstruction(
-      nodeIndex: number, span: ParseSourceSpan|null, reference: o.ExternalReference,
-      paramsOrFn?: o.Expression[]|(() => o.Expression[])) {
+  private selectInstruction(nodeIndex: number, span: ParseSourceSpan|null) {
     if (this._lastNodeIndexWithFlush < nodeIndex) {
       this.instructionFn(this._updateCodeFns, span, R3.select, [o.literal(nodeIndex)]);
       this._lastNodeIndexWithFlush = nodeIndex;
     }
+  }
+
+  private updateInstruction(
+      nodeIndex: number, span: ParseSourceSpan|null, reference: o.ExternalReference,
+      paramsOrFn?: o.Expression[]|(() => o.Expression[])) {
+    this.selectInstruction(nodeIndex, span);
     this.instructionFn(this._updateCodeFns, span, reference, paramsOrFn || []);
   }
 

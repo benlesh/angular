@@ -112,6 +112,7 @@ export {
   elementHostStylingApply as ɵelementHostStylingApply,
 
   select as ɵselect,
+  property as ɵproperty,
   textBinding as ɵtextBinding,
   template as ɵtemplate,
   embeddedViewEnd as ɵembeddedViewEnd,

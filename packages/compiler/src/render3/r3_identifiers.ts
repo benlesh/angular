@@ -33,6 +33,8 @@ export class Identifiers {
 
   static select: o.ExternalReference = {name: 'ɵselect', moduleName: CORE};
 
+  static property: o.ExternalReference = {name: 'ɵproperty', moduleName: CORE};
+
   static componentHostSyntheticProperty:
       o.ExternalReference = {name: 'ɵcomponentHostSyntheticProperty', moduleName: CORE};
 

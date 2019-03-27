@@ -105,6 +105,7 @@ export const angularCoreEnv: {[name: string]: Function} = {
   'ɵelementHostStylingApply': r3.elementHostStylingApply,
   'ɵelementHostClassProp': r3.elementHostClassProp,
   'ɵselect': r3.select,
+  'ɵproperty': r3.property,
   'ɵtemplate': r3.template,
   'ɵtext': r3.text,
   'ɵtextBinding': r3.textBinding,

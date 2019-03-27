@@ -64,6 +64,7 @@ export {
   elementHostStylingApply,
 
   select,
+  property,
 
   listener,
   store,

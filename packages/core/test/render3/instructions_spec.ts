@@ -174,6 +174,7 @@ describe('instructions', () => {
   });
 
   describe('property', () => {
+    // TODO(benlesh): Replace with TestBed tests once the instruction is being generated.
     it('should set properties of the selected element', () => {
       const t = new TemplateFixture(createDiv, () => {}, 1, 1);
       t.update(() => {
@@ -195,6 +196,7 @@ describe('instructions', () => {
       });
     });
 
+    // TODO(benlesh): Replace with TestBed tests once the instruction is being generated.
     it('should chain', () => {
       const t = new TemplateFixture(createDiv, () => {}, 1, 2);
       t.update(() => {
@@ -216,6 +218,7 @@ describe('instructions', () => {
       });
     });
 
+    // TODO(benlesh): Replace with TestBed tests once the instruction is being generated.
     it('should diff value changes', () => {
       const t = new TemplateFixture(createDiv, () => {}, 1, 2);
       t.update(() => {

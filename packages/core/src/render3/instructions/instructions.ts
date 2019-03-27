@@ -1196,6 +1196,7 @@ export function property<T>(
 }
 
 /**
+ * **TODO: Remove this function after `property` is in use**
  * Update a property on an element.
  *
  * If the property name also exists as an input property on one of the element's directives,

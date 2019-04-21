@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import {validateAgainstEventAttributes} from '../../sanitization/sanitization';
-import {assertDataInRange, assertEqual} from '../../util/assert';
+import {assertDataInRange, assertEqual, assertNotEqual} from '../../util/assert';
 import {assertHasParent} from '../assert';
 import {attachPatchData} from '../context_discovery';
 import {registerPostOrderHooks} from '../hooks';
@@ -25,6 +25,7 @@ import {NO_CHANGE} from '../tokens';
 import {attrsStylingIndexOf, setUpAttributes} from '../util/attrs_utils';
 import {renderStringify} from '../util/misc_utils';
 import {getNativeByIndex, getNativeByTNode, getTNode} from '../util/view_utils';
+import {ɵɵbind} from './property';
 import {createDirectivesAndLocals, createNodeAtIndex, elementCreate, executeContentQueries, initializeTNodeInputs, setInputsForProperty, setNodeStylingTemplate} from './shared';
 import {getActiveDirectiveStylingIndex} from './styling';
 
@@ -189,9 +190,28 @@ export function ɵɵelement(
   ɵɵelementEnd();
 }
 
-
 /**
- * Updates the value of removes an attribute on an Element.
+ * Updates the value or removes an attribute on an Element.
+ *
+ * @param name name The name of the attribute.
+ * @param value value The attribute is removed when value is `null` or `undefined`.
+ *                  Otherwise the attribute value is set to the stringified value.
+ * @param sanitizer An optional function used to sanitize the value.
+ * @param namespace Optional namespace to use when setting the attribute.
+ *
+ * @codeGenApi
+ */
+export function ɵɵattribute(
+    name: string, value: any, sanitizer?: SanitizerFn | null, namespace?: string): void {
+  const index = getSelectedIndex();
+  ngDevMode && assertNotEqual(index, -1, 'selected index cannot be -1');
+  return ɵɵelementAttribute(index, name, ɵɵbind(value), sanitizer, namespace);
+}
+
+
+// TODO(benlesh): Remove the following instruction.
+/**
+ * Updates the value or removes an attribute on an Element.
  *
  * @param number index The index of the element in the data array
  * @param name name The name of the attribute.

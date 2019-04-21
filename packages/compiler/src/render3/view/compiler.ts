@@ -652,9 +652,15 @@ function createHostBindingsFunction(
         }
       }
 
-      const instructionParams: o.Expression[] = [
-        elVarExp, o.literal(bindingName), o.importExpr(R3.bind).callFn([bindingExpr.currValExpr])
-      ];
+      const instructionParams: o.Expression[] = instruction === R3.attribute ?
+          [
+            o.literal(bindingName),
+            bindingExpr.currValExpr,
+          ] :
+          [
+            elVarExp, o.literal(bindingName),
+            o.importExpr(R3.bind).callFn([bindingExpr.currValExpr])
+          ];
       if (sanitizerFn) {
         instructionParams.push(sanitizerFn);
       }
@@ -753,7 +759,7 @@ function getBindingNameAndInstruction(binding: ParsedProperty):
   const attrMatches = bindingName.match(ATTR_REGEX);
   if (attrMatches) {
     bindingName = attrMatches[1];
-    instruction = R3.elementAttribute;
+    instruction = R3.attribute;
   } else {
     if (binding.isAnimation) {
       bindingName = prepareSyntheticPropertyName(bindingName);

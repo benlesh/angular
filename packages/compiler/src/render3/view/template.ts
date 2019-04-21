@@ -753,6 +753,12 @@ export class TemplateDefinitionBuilder implements t.Visitor<void>, LocalResolver
                 o.literal(attrName), this.convertPropertyBinding(implicit, value, true), ...params
               ];
             });
+          } else if (inputType === BindingType.Attribute && !(value instanceof Interpolation)) {
+            this.updateInstruction(elementIndex, input.sourceSpan, R3.attribute, () => {
+              return [
+                o.literal(attrName), this.convertPropertyBinding(implicit, value, true), ...params
+              ];
+            });
           } else {
             let instruction: any;
 
@@ -762,6 +768,7 @@ export class TemplateDefinitionBuilder implements t.Visitor<void>, LocalResolver
             } else if (inputType === BindingType.Class) {
               instruction = R3.elementClassProp;
             } else {
+              // Interpolated attributes.
               instruction = R3.elementAttribute;
             }
 

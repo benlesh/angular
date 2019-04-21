@@ -39,8 +39,6 @@ export class Identifiers {
   static componentHostSyntheticListener:
       o.ExternalReference = {name: 'ɵɵcomponentHostSyntheticListener', moduleName: CORE};
 
-  static elementAttribute: o.ExternalReference = {name: 'ɵɵelementAttribute', moduleName: CORE};
-
   static elementClassProp: o.ExternalReference = {name: 'ɵɵelementClassProp', moduleName: CORE};
 
   static elementContainerStart:
@@ -122,6 +120,8 @@ export class Identifiers {
   static pipeBind3: o.ExternalReference = {name: 'ɵɵpipeBind3', moduleName: CORE};
   static pipeBind4: o.ExternalReference = {name: 'ɵɵpipeBind4', moduleName: CORE};
   static pipeBindV: o.ExternalReference = {name: 'ɵɵpipeBindV', moduleName: CORE};
+
+  static attribute: o.ExternalReference = {name: 'ɵɵattribute', moduleName: CORE};
 
   static property: o.ExternalReference = {name: 'ɵɵproperty', moduleName: CORE};
 

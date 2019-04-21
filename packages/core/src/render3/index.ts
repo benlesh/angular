@@ -22,6 +22,8 @@ export {
   store,
   tick,
   ɵɵallocHostVars,
+
+  ɵɵattribute,
   ɵɵbind,
   ɵɵcomponentHostSyntheticListener,
   ɵɵcomponentHostSyntheticProperty,
@@ -33,7 +35,6 @@ export {
   ɵɵdirectiveInject,
 
   ɵɵelement,
-  ɵɵelementAttribute,
   ɵɵelementClassProp,
   ɵɵelementContainerEnd,
 

@@ -97,7 +97,6 @@ export {
   ɵɵenableBindings,
   ɵɵdisableBindings,
   ɵɵallocHostVars,
-  ɵɵelementAttribute,
   ɵɵelementContainerStart,
   ɵɵelementContainerEnd,
   ɵɵelementStyling,
@@ -112,6 +111,8 @@ export {
   ɵɵelementHostStyleProp,
   ɵɵelementHostClassProp,
   ɵɵelementHostStylingApply,
+
+  ɵɵattribute,
 
   ɵɵselect,
   ɵɵtextBinding,
